@@ -1,0 +1,29 @@
+{
+  "name": "windgustmap",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Sam Kersebet",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "export": "next build && next export",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/colbyfayock/next-leaflet-starter"
+  },
+  "bugs": {
+    "url": "https://github.com/colbyfayock/next-leaflet-starter/issues"
+  },
+  "dependencies": {
+    "csvtojson": "^2.0.10",
+    "googleapis": "^109.0.1",
+    "leaflet": "^1.9.2",
+    "next": "^13.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leaflet": "^4.1.0",
+    "request": "^2.88.2"
+  }
+}
