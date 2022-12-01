@@ -1,7 +1,5 @@
 import Head from "next/head";
-
 import Map from "../components/Map";
-
 import styles from "../../styles/Home.module.css";
 //pull in Asos stations
 import asosData from "../data/ASOS.json";
@@ -39,6 +37,7 @@ export default function Home(props) {
                     [{station.lat}, {station.lon}] {station.name},
                     {station.station} <br /> Current Wind Speed: {station.sknt}{" "}
                     kts.
+                    <br /> Current Gust Speed: {station.gustFactor} kts.
                   </Tooltip>
                   <Popup>
                     <embed
@@ -56,7 +55,7 @@ export default function Home(props) {
   );
 }
 
-let getUrl =
+let weatherUrl =
   "https://mesonet.agron.iastate.edu/api/1/currents.json?networkclass=ASOS&country=US";
 
 let codes = asosData.map((x) => x.code);
@@ -65,24 +64,49 @@ export async function getStaticProps() {
   // If this request throws an uncaught error, Next.js will
   // not invalidate the currently shown page and
   // retry getStaticProps on the next request.
-  const res = await fetch(getUrl);
-  const stations = await res.json();
+  const weatherRes = await fetch(weatherUrl);
+  const stations = await weatherRes.json();
 
-  if (!res.ok) {
+  if (!weatherRes.ok) {
     // If there is a server error, you might want to
     // throw an error instead of returning so that the cache is not updated
     // until the next successful request.
-    throw new Error(`Failed to fetch posts, received status ${res.status}`);
+    throw new Error(
+      `Failed to fetch posts, received status ${weatherRes.status}`
+    );
   }
 
-  console.log(codes);
+  //testing
+  //console.log(codes);
 
   function isStation(x) {
     let rawCode = x.raw.substring(0, 4);
     return codes.includes(rawCode);
   }
-
+  //Filter out stations from data
   let asosStations = stations.data.filter(isStation);
+  (async function () {
+    for (const element of asosStations) {
+      if (element.station.length < 4) {
+        element.station = "K" + element.station;
+      }
+      console.log(element.sknt);
+      if (element.sknt === null) {
+        element.sknt = 0;
+      }
+      if (element.drct === null) {
+        element.drct = 0;
+      }
+      const sheetRes = await fetch(
+        `http://localhost:3000/api/processWindSpeed?speed=${element.sknt}&degree=${element.drct}&code=${element.station}`
+      );
+      const gustFactor = await sheetRes.json();
+      const [[gf]] = gustFactor.data;
+      console.log(gf);
+      element.gustFactor = gf;
+      console.log(element.gustFactor);
+    }
+  })();
 
   return {
     props: {
