@@ -1,72 +1,24 @@
 import Head from "next/head";
 import Map from "../components/Map";
 import styles from "../../styles/Home.module.css";
+import { useEffect, useState } from "react";
 //pull in Asos stations
 import asosData from "../data/ASOS.json";
 import _ from "lodash";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import addHighchartsMore from "highcharts/highcharts-more";
+import HighchartsMore from "highcharts/highcharts-more";
+//import PdfViewer from "../components/PdfViewer";
 
-console.log(Highcharts);
-addHighchartsMore(Highcharts);
-
-const options = {
-  chart: {
-    type: "polar",
-  },
-  title: {
-    text: "Kahn Chart",
-  },
-  pane: {
-    startAngle: 0,
-    endAngle: 360,
-  },
-  xAxis: {
-    tickInterval: 90,
-    min: 0,
-    max: 360,
-    labels: {
-      format: "{value}°",
-    },
-  },
-  yAxis: {
-    min: 0,
-    max: 10,
-  },
-  plotOptions: {
-    series: {
-      pointStart: 0,
-      pointInterval: 90,
-    },
-    column: {
-      pointPadding: 0,
-      groupPadding: 0,
-    },
-  },
-  series: [
-    {
-      type: "area",
-      name: "c1",
-      data: [7.15, 10, 9.85, 8.81],
-    },
-    {
-      type: "line",
-      name: "c2",
-      data: [4.65, 3.16, 4.3, 4.48],
-    },
-    {
-      type: "line",
-      name: "Fair Value",
-      data: [4.77, 6.67, 6.57, 5.87],
-    },
-  ],
-};
+if (typeof Highcharts === "object") {
+  HighchartsMore(Highcharts);
+}
 
 const DEFAULT_CENTER = [43.04005521649368, -87.90036438958596];
 
 export default function Home(props) {
-  console.log(props.finals);
+  const [showPdf, setShowPdf] = useState(false);
+  //console.log(props.finals);
   return (
     <div>
       <Head>
@@ -101,17 +53,85 @@ export default function Home(props) {
                     Station Code: {station.station}
                     <br /> Current Wind Speed: {station.sknt} kts.
                     <br /> Current Gust Speed: {station.gustSpeed} kts.
+                    <br /> Current Gust Direction: {station.drct} deg.
                   </Tooltip>
                   <Popup className={styles.popup}>
                     <HighchartsReact
                       highcharts={Highcharts}
-                      options={options}
+                      options={{
+                        chart: {
+                          polar: true,
+                        },
+
+                        title: {
+                          text: station.station,
+                        },
+
+                        subtitle: {
+                          text: `Calculated gust factor for ${station.name}`,
+                        },
+
+                        pane: {
+                          startAngle: 0,
+                          endAngle: 360,
+                        },
+
+                        xAxis: {
+                          tickInterval: 30,
+                          min: 0,
+                          max: 360,
+                          labels: {
+                            format: "{value}°",
+                          },
+                        },
+
+                        yAxis: {
+                          min: 0,
+                          max: 20,
+                          tickInterval: 5,
+                          title: {
+                            text: "Wind Speed",
+                          },
+                        },
+
+                        plotOptions: {
+                          series: {
+                            pointStart: 0,
+                            pointInterval: 45,
+                          },
+                          column: {
+                            pointPadding: 0,
+                            groupPadding: 0,
+                          },
+                        },
+
+                        series: [
+                          {
+                            name: `Gust Factor at ${station.station} `,
+                            data: [
+                              {
+                                name: station.gustFactor,
+                                y: station.sknt,
+                                x: station.drct,
+                              },
+                            ],
+                          },
+                        ],
+                      }}
                     ></HighchartsReact>
-                    {/* <embed
-                      src={"/pdf/" + station.raw.substring(0, 4) + ".pdf"}
-                      type="application/pdf"
-                    /> */}
                   </Popup>
+                  {
+                    //To build a PDF Modal
+                    /* <PdfViewer
+                      pdf={"/pdf/" + station.raw.substring(0, 4) + ".pdf"}
+                      onCancel={() => setShowPdf(false)}
+                      visible={showPdf}
+                    />
+                    <Button
+                      onClick={() => setShowPdf(!showPdf)}
+                    >{`View Original PDF`}</Button>
+                  */
+                  }
                 </Marker>
               ))}
             </>

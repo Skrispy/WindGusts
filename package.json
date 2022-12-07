@@ -17,10 +17,10 @@
     "url": "https://github.com/colbyfayock/next-leaflet-starter/issues"
   },
   "dependencies": {
+    "antd": "^5.0.4",
     "csvtojson": "^2.0.10",
     "googleapis": "^109.0.1",
     "highcharts": "^10.3.2",
-    "highcharts-more": "^0.1.7",
     "highcharts-react-official": "^3.1.0",
     "leaflet": "^1.9.2",
     "lodash": "^4.17.21",
@@ -29,6 +29,7 @@
     "react-dom": "^18.2.0",
     "react-jsx-highcharts": "^5.0.0",
     "react-leaflet": "^4.1.0",
+    "react-pdf-js": "^5.1.0",
     "request": "^2.88.2"
   }
 }
