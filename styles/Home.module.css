@@ -65,7 +65,8 @@
 }
 
 .popup{
-  width: 300px;
+  width: 350px;
   text-align: center;
+  align-items: center;
 }
 

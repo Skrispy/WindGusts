@@ -1,39 +1,23 @@
-import React, { useState, useRef } from "react";
-import { usePdf } from "@mikecousins/react-pdf";
+import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 
-const MyPdfViewer = ({ pdfUrl }) => {
-  const [page, setPage] = useState(1);
-  const canvasRef = useRef(null);
+function PdfViewer(pdf) {
+  const [isBrowser, setIsBrowser] = useState(false);
 
-  const { pdfDocument, pdfPage } = usePdf({
-    file: "test.pdf",
-    page,
-    canvasRef,
-  });
+  useEffect(() => {
+    setIsBrowser(true);
+  }, []);
 
-  return (
-    <div>
-      {!pdfDocument && <span>Loading...</span>}
-      <canvas ref={canvasRef} />
-      {Boolean(pdfDocument && pdfDocument.numPages) && (
-        <nav>
-          <ul className="pager">
-            <li className="previous">
-              <button disabled={page === 1} onClick={() => setPage(page - 1)}>
-                Previous
-              </button>
-            </li>
-            <li className="next">
-              <button
-                disabled={page === pdfDocument.numPages}
-                onClick={() => setPage(page + 1)}
-              >
-                Next
-              </button>
-            </li>
-          </ul>
-        </nav>
-      )}
-    </div>
-  );
-};
+  if (isBrowser) {
+    return ReactDOM.createPortal(
+      <div>
+        <a src={pdf}></a>
+      </div>,
+      document.getElementById("modal-root")
+    );
+  } else {
+    return null;
+  }
+}
+
+export default PdfViewer;

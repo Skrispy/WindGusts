@@ -8,7 +8,6 @@ import _ from "lodash";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
-//import PdfViewer from "../components/PdfViewer";
 
 if (typeof Highcharts === "object") {
   HighchartsMore(Highcharts);
@@ -17,7 +16,7 @@ if (typeof Highcharts === "object") {
 const DEFAULT_CENTER = [43.04005521649368, -87.90036438958596];
 
 export default function Home(props) {
-  const [showPdf, setShowPdf] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   //console.log(props.finals);
   return (
     <div>
@@ -31,7 +30,7 @@ export default function Home(props) {
 
         <p className={styles.description}>
           Interact with a weather station to view a max wind gust and see how it
-          is calculated{" "}
+          is calculated , you can look at the PDFs for more information.
         </p>
 
         <Map className={styles.homeMap} center={DEFAULT_CENTER} zoom={2}>
@@ -52,7 +51,7 @@ export default function Home(props) {
                     <br />
                     Station Code: {station.station}
                     <br /> Current Wind Speed: {station.sknt} kts.
-                    <br /> Current Gust Speed: {station.gustSpeed} kts.
+                    <br /> Current Max Gust Speed: {station.gustSpeed} kts.
                     <br /> Current Gust Direction: {station.drct} deg.
                   </Tooltip>
                   <Popup className={styles.popup}>
@@ -119,19 +118,21 @@ export default function Home(props) {
                         ],
                       }}
                     ></HighchartsReact>
+                    <a href={`../pdf/${station.station}.pdf`} target="_blank">
+                      <button> Get pdf </button>
+                    </a>
+                    <p>{`Current Windspeed at ${station.station} is ${
+                      station.sknt
+                    } Knots and is coming from ${
+                      station.drct
+                    } Degrees. This calculates to a gust factor of ${
+                      station.gustFactor
+                    }. This gust factor times current windspeed is your maximum gust speed, ${
+                      station.gustFactor
+                    }*${station.sknt} = ${
+                      station.gustFactor * station.sknt
+                    } Knots`}</p>
                   </Popup>
-                  {
-                    //To build a PDF Modal
-                    /* <PdfViewer
-                      pdf={"/pdf/" + station.raw.substring(0, 4) + ".pdf"}
-                      onCancel={() => setShowPdf(false)}
-                      visible={showPdf}
-                    />
-                    <Button
-                      onClick={() => setShowPdf(!showPdf)}
-                    >{`View Original PDF`}</Button>
-                  */
-                  }
                 </Marker>
               ))}
             </>
@@ -218,6 +219,7 @@ export async function getStaticProps() {
     props: {
       finals,
     },
+    revalidate: 3600,
   };
 }
 
